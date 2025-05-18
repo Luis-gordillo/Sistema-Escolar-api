@@ -49,15 +49,14 @@ class EventoView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class EventoViewEdit(generics.CreateAPIView):
     permission_classes = (permissions.IsAuthenticated,)
-    
+
     @transaction.atomic
     def put(self, request, *args, **kwargs):
-        # Se asume que en el payload viene el "id" del evento
         evento = get_object_or_404(Evento, id=request.data["id"])
         
-        # Actualizar los campos del evento con los valores enviados
         evento.nombre = request.data.get("nombre", evento.nombre)
         evento.tipo = request.data.get("tipo", evento.tipo)
         evento.fecha_realizacion = request.data.get("fecha_realizacion", evento.fecha_realizacion)
@@ -74,3 +73,12 @@ class EventoViewEdit(generics.CreateAPIView):
         
         serializer = EventoSerializer(evento, many=False)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def delete(self, request, *args, **kwargs):
+        # Se espera que el ID del evento se reciba vía query string (por ejemplo: ?id=5)
+        evento = get_object_or_404(Evento, id=request.GET.get("id"))
+        try:
+            evento.delete()
+            return Response({"details": "Evento eliminado"}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"details": "Error al eliminar el evento: "  + str(e)}, status=status.HTTP_400_BAD_REQUEST)

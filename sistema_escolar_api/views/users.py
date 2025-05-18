@@ -347,8 +347,7 @@ class MaestrosViewEdit(generics.CreateAPIView):
         
 class AlumnoViewEdit(generics.CreateAPIView):
     permission_classes = (permissions.IsAuthenticated,)
-    
-    # Editar alumno
+
     def put(self, request, *args, **kwargs):
         alumno = get_object_or_404(Alumnos, id=request.data["id"])
         alumno.matricula = request.data["matricula"]
@@ -367,6 +366,11 @@ class AlumnoViewEdit(generics.CreateAPIView):
         temp.save()
 
         # Serializar y devolver los datos actualizados
-        user = AlumnoSerializer(alumno, many=False).data
+        data = AlumnoSerializer(alumno, many=False).data
+        return Response(data, status=status.HTTP_200_OK)
 
-        return Response(user, 200)
+    def delete(self, request, id, *args, **kwargs):
+        # Extraer el alumno usando el ID proporcionado en la URL
+        alumno = get_object_or_404(Alumnos, id=id)
+        alumno.delete()
+        return Response({"message": "Alumno eliminado correctamente"}, status=status.HTTP_204_NO_CONTENT)

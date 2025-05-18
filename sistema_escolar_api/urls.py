@@ -32,7 +32,7 @@ urlpatterns = [
     #Create Alumno
         path('alumnos/', users.AlumnoView.as_view()),
     #Edit Alumno
-        path('alumnos-edit/', users.AlumnoViewEdit.as_view()),
+        path('alumnos-edit/<int:id>/', users.AlumnoViewEdit.as_view()),    
     #Create Maestro
         path('maestros/', users.MaestrosView.as_view()),
     #Edit Maestro
